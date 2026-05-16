@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Scale } from "lucide-react";
@@ -11,6 +12,12 @@ const LINKS = [
 
 export default function NavBar() {
   const pathname = usePathname();
+
+  useEffect(() => {
+    // Warm the Python runtime so the first real predict/audit isn't a cold start.
+    fetch("/api/warmup").catch(() => {});
+  }, []);
+
   return (
     <nav className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3">
