@@ -5,9 +5,10 @@ Body (JSON): the 8 ApplicantInput fields (see lib/feature_names.json).
 Returns the PredictionResult shape from lib/types.ts:
   { decision, probability, confidence, top_factors[], explanation, is_mock:false }
 
-SHAP: exact per-feature contributions via shap.LinearExplainer on the
-LogisticRegression, aggregated from the one-hot/scaled space back to the
-8 original fields.
+SHAP: exact per-feature contributions computed analytically from the
+LogisticRegression coefficients — phi_j = coef_j * (x_j - E[x_j]) — which is
+identical to shap.LinearExplainer for a linear model but needs no shap/numba
+dependency. Aggregated from the one-hot/scaled space back to the 8 fields.
 """
 
 from __future__ import annotations
@@ -41,8 +42,6 @@ def _ensure_loaded() -> dict:
     import joblib
     import numpy as np
     import pandas as pd
-    import shap
-
     contract = json.loads((LIB / "feature_names.json").read_text())
     model = joblib.load(LIB / "model.pkl")
     pre = model.named_steps["pre"]
@@ -52,7 +51,13 @@ def _ensure_loaded() -> dict:
     order = contract["feature_order"]
     bg = pre.transform(sample[order].head(100))
     bg = bg.toarray() if hasattr(bg, "toarray") else np.asarray(bg)
-    explainer = shap.LinearExplainer(clf, bg)
+
+    # Exact SHAP for a linear model, interventional perturbation — identical
+    # to shap.LinearExplainer(clf, bg): phi_j = coef_j * (x_j - E[x_j]) in the
+    # transformed space, E[x] = background mean. Deriving it from the model
+    # coefficients keeps shap/numba/llvmlite out of the serverless bundle.
+    bg_mean = bg.mean(axis=0)
+    coef = np.asarray(clf.coef_)[0]
 
     # transformed-column -> original-feature map for SHAP aggregation
     out_names = list(pre.get_feature_names_out())
@@ -71,7 +76,8 @@ def _ensure_loaded() -> dict:
         model=model,
         pre=pre,
         clf=clf,
-        explainer=explainer,
+        bg_mean=bg_mean,
+        coef=coef,
         col_to_feat=col_to_feat,
         order=order,
         np=np,
@@ -124,11 +130,8 @@ def run_prediction(payload: dict) -> dict:
     proba = float(st["clf"].predict_proba(Xt)[0, 1])
     decision = "approved" if proba >= 0.5 else "denied"
 
-    sv = st["explainer"].shap_values(Xt)
-    sv = np.asarray(sv)
-    if sv.ndim == 3:  # (classes, n, feat) in some shap versions
-        sv = sv[-1]
-    shap_row = sv[0]
+    # Exact linear SHAP: phi_j = coef_j * (x_j - E[x_j])
+    shap_row = st["coef"] * (Xt[0] - st["bg_mean"])
 
     agg: dict[str, float] = {}
     for col_i, feat in enumerate(st["col_to_feat"]):
