@@ -1,0 +1,75 @@
+{
+  "generated_at": "2026-05-16T18:00:00Z",
+  "sample_size": 250,
+  "is_mock": true,
+  "overall_fairscore": 0.86,
+  "metrics": [
+    {
+      "key": "demographic_parity",
+      "label": "Demographic Parity",
+      "value": 0.124,
+      "ci_lower": 0.086,
+      "ci_upper": 0.161,
+      "description": "Gap in approval rate between groups, regardless of whether they would repay."
+    },
+    {
+      "key": "equal_opportunity",
+      "label": "Equal Opportunity",
+      "value": 0.078,
+      "ci_lower": 0.041,
+      "ci_upper": 0.114,
+      "description": "Gap in approval rate among applicants who would actually repay the loan."
+    },
+    {
+      "key": "predictive_parity",
+      "label": "Predictive Parity",
+      "value": 0.039,
+      "ci_lower": 0.012,
+      "ci_upper": 0.067,
+      "description": "Gap in precision: of those approved, how many actually repay, across groups."
+    },
+    {
+      "key": "calibration",
+      "label": "Calibration",
+      "value": 0.091,
+      "ci_lower": 0.052,
+      "ci_upper": 0.130,
+      "description": "Gap between predicted probability and actual repayment rate across score bins."
+    }
+  ],
+  "per_group": {
+    "gender": [
+      { "group": "male", "approval_rate": 0.742, "n": 169 },
+      { "group": "female", "approval_rate": 0.618, "n": 81 }
+    ],
+    "age_group": [
+      { "group": "young", "approval_rate": 0.572, "n": 103 },
+      { "group": "middle", "approval_rate": 0.713, "n": 119 },
+      { "group": "senior", "approval_rate": 0.694, "n": 28 }
+    ]
+  },
+  "worst_dimension": {
+    "metric": "demographic_parity",
+    "label": "Demographic Parity",
+    "value": 0.124,
+    "explanation": "Male applicants are approved 12.4 percentage points more often than female applicants (74.2% vs 61.8%). This is the largest disparity FairScore detected and exceeds the 10% concern threshold."
+  },
+  "intersectional": {
+    "rows": "gender",
+    "cols": "age_group",
+    "row_values": ["male", "female"],
+    "col_values": ["young", "middle", "senior"],
+    "cells": [
+      [
+        { "approval_rate": 0.66, "n": 71 },
+        { "approval_rate": 0.79, "n": 80 },
+        { "approval_rate": 0.77, "n": 18 }
+      ],
+      [
+        { "approval_rate": 0.49, "n": 32 },
+        { "approval_rate": 0.64, "n": 39 },
+        { "approval_rate": 0.6, "n": 10 }
+      ]
+    ]
+  }
+}

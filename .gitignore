@@ -8,3 +8,11 @@ dist
 *.tsbuildinfo
 next-env.d.ts
 .DS_Store
+
+# Python
+.venv
+__pycache__/
+*.pyc
+
+# Local tooling
+.claude/

@@ -1,0 +1,70 @@
+{
+  "numeric_features": [
+    "annual_income",
+    "loan_amount",
+    "loan_duration_months",
+    "age"
+  ],
+  "categorical_features": [
+    "credit_history",
+    "employment_length",
+    "housing",
+    "purpose"
+  ],
+  "categorical_options": {
+    "credit_history": [
+      "critical",
+      "delayed",
+      "existing paid",
+      "no credits",
+      "paid back duly"
+    ],
+    "employment_length": [
+      "1-4 yrs",
+      "4-7 yrs",
+      "7+ yrs",
+      "<1 yr",
+      "unemployed"
+    ],
+    "housing": [
+      "free",
+      "own",
+      "rent"
+    ],
+    "purpose": [
+      "business",
+      "car",
+      "education",
+      "furniture",
+      "other"
+    ]
+  },
+  "feature_order": [
+    "annual_income",
+    "loan_amount",
+    "loan_duration_months",
+    "age",
+    "credit_history",
+    "employment_length",
+    "housing",
+    "purpose"
+  ],
+  "sensitive_attributes": {
+    "gender": [
+      "female",
+      "male"
+    ],
+    "age_group": [
+      "young",
+      "middle",
+      "senior"
+    ]
+  },
+  "target": {
+    "name": "label",
+    "approve": 1,
+    "deny": 0
+  },
+  "dataset": "German Credit (OpenML credit-g)",
+  "notes": "annual_income is a synthesized demo feature; German Credit has no income column."
+}
